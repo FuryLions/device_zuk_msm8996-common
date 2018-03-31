@@ -24,6 +24,10 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+on early-init
+    # Enable sched boost
+    write /proc/sys/kernel/sched_boost 1
+    setprop sys.io.scheduler noop
 
 on init
     # Disable UFS powersaving
@@ -50,9 +54,6 @@ on boot
     chown system system /dev/cpuset/camera-daemon
     chown system system /dev/cpuset/camera-daemon/tasks
     chmod 0664 /dev/cpuset/camera-daemon/tasks
-
-    # Enable sched boost
-    write /proc/sys/kernel/sched_boost 1
 
 on charger
     wait /dev/block/platform/soc/${ro.boot.bootdevice}
@@ -169,8 +170,8 @@ on enable-low-power
 on property:sys.boot_completed=1
     trigger enable-low-power
 
-    # Set I/O squeduler
-    setprop sys.io.scheduler "bfq"
+    # Set I/O scheduler
+    setprop sys.io.scheduler cfq
 
     # update cpusets now that boot is complete and we want better load balancing
     write /dev/cpuset/top-app/cpus 0-3
